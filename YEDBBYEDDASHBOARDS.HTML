@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+<meta charset="utf-8">
+<title>Dashboard Admin - يد بيد</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f7f4ed;--card:#fff;--tx:#1c2733;--mut:#566474;--pri:#0f6b5c;--acc:#ff8a61;--line:#cdd5df;--chip:#e2eadf}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Cairo','Inter',sans-serif}
+body{background:var(--bg);color:var(--tx);padding:20px;direction:rtl}
+.wrap{max-width:1100px;margin:auto}
+header{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.logo{font-weight:900;font-size:22px;color:var(--pri);display:flex;align-items:center;gap:10px;text-decoration:none}
+.admin-badge{background:var(--chip);padding:6px 12px;border-radius:8px;font-size:13px;font-weight:700;color:var(--pri)}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:15px;margin-bottom:24px}
+.stat-card{background:var(--card);border:1px solid var(--line);padding:18px;border-radius:14px;text-align:center}
+.stat-card h4{color:var(--mut);font-size:13px;margin-bottom:6px}
+.stat-card .val{font-size:24px;font-weight:900;color:var(--pri)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 22px}
+.chip{background:var(--chip);color:var(--tx);border:0;padding:8px 16px;border-radius:99px;cursor:pointer;font-weight:600;font-size:14px}
+.chip.on{background:var(--pri);color:#fff}
+.ac{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin:12px 0;display:grid;gap:10px}
+.btn{display:inline-block;background:var(--pri);color:#fff;border:0;padding:6px 12px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer}
+.btn.alt{background:transparent;color:var(--pri);border:1px solid var(--pri)}
+select{padding:6px;border:1px solid var(--line);border-radius:8px;background:var(--bg);font-family:inherit}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <a class="logo" href="#">
+      <svg width="36" height="36" viewBox="0 0 44 44" fill="none"><rect width="44" height="44" rx="12" fill="#0f6b5c"/><path d="M22 23.5C22 23.5 14 19 14 14C14 11.2 16.2 9 19 9C20.6 9 22 9.8 22 9.8C22 9.8 23.4 9 25 9C27.8 9 30 11.2 30 14C30 19 22 23.5 22 23.5Z" fill="#ff8a61"/><path d="M11 31.5C14.5 27 20 27.5 22 28.5C24 27.5 29.5 27 33 31.5" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round"/></svg>
+      لوحة تحكم الإدارة - يد بيد
+    </a>
+    <div class="admin-badge">📧 saberboukhaled666@gmail.com</div>
+  </header>
+
+  <!-- المؤشرات الإحصائية -->
+  <div class="stats-grid">
+    <div class="stat-card"><h4>نسبة نجاح التوصيل (Success Rate)</h4><div class="val">95.2%</div></div>
+    <div class="stat-card"><h4>نسبة المرتجعات (Taux de retour)</h4><div class="val" style="color:var(--acc);">1.8%</div></div>
+    <div class="stat-card"><h4>طلبات الزبناء قيد التوصيل</h4><div class="val">12 طلب</div></div>
+    <div class="stat-card"><h4>طلبات البائعين المعلقة</h4><div class="val">3 طلبات</div></div>
+  </div>
+
+  <section>
+    <div class="chips">
+      <button class="chip on" onclick="switchTab('orders', this)">طلبات الشراء وتتبع التوصيل</button>
+      <button class="chip" onclick="switchTab('vendeurs', this)">طلبات تسجيل البائعين والتعاونيات</button>
+      <button class="chip" onclick="switchTab('feedback', this)">تقييمات وآراء الزبناء (Feedback)</button>
+    </div>
+
+    <div id="contentArea"></div>
+  </section>
+</div>
+
+<script>
+let adminData = {
+  orders: [
+    {id: 101, client: "عمر الفيلالي", phone: "0611223344", item: "سلة من سعف الدوم", total: "120 درهم", status: "shipped"},
+    {id: 102, client: "سارة العلمي", phone: "0666554433", item: "زيت أركان تجميلي", total: "150 درهم", status: "pending"}
+  ],
+  vendeurs: [
+    {id: 1, name: "تعاونية نساء الأطلس", type: "تعاونية", city: "خنيفرة", status: "pending"},
+    {id: 2, name: "خديجة الإدريسي", type: "فرد", city: "أسفي", status: "approved"}
+  ],
+  feedback: [
+    {client: "أمين برادة", rating: "★★★★★", msg: "جودة المنتجات ممتازة والتوصيل في الوقت."}
+  ]
+};
+
+let currentTab = 'orders';
+
+function switchTab(t, b){
+  currentTab = t;
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+  b.classList.add('on');
+  render();
+}
+
+function render(){
+  let html = "";
+  if(currentTab === 'orders'){
+    html = adminData.orders.map(o => `
+      <div class="ac">
+        <div><b>الزبون: ${o.client}</b> (📞 ${o.phone})</div>
+        <div>المنتج: ${o.item} · المجموع: <b>${o.total}</b></div>
+        <div>حالة التوصيل: 
+          <select onchange="alert('تم تحديث حالة الطلب إلى الإيميل saberboukhaled666@gmail.com')">
+            <option value="pending" ${o.status==='pending'?'selected':''}>قيد التحضير</option>
+            <option value="shipped" ${o.status==='shipped'?'selected':''}>قيد التوصيل (في الطريق)</option>
+            <option value="delivered">تم التسليم بنجاح ✅</option>
+          </select>
+        </div>
+      </div>
+    `).join("");
+  } else if(currentTab === 'vendeurs'){
+    html = adminData.vendeurs.map(v => `
+      <div class="ac">
+        <div><b>${v.name}</b> (${v.type}) · المدينة: ${v.city}</div>
+        <div>
+          ${v.status === 'pending' ? `
+            <button class="btn" onclick="v.status='approved'; render();">قبول واعتماد (Approve)</button>
+            <button class="btn alt" onclick="v.status='rejected'; render();">رفض</button>
+          ` : `<b>الحالة: ${v.status==='approved'?'معتمد للبيع ✅':'مرفوض ❌'}</b>`}
+        </div>
+      </div>
+    `).join("");
+  } else if(currentTab === 'feedback'){
+    html = adminData.feedback.map(f => `
+      <div class="ac"><div><b>${f.client}</b> · ${f.rating}</div><div>"${f.msg}"</div></div>
+    `).join("");
+  }
+  document.getElementById("contentArea").innerHTML = html;
+}
+
+render();
+</script>
+</body>
+</html>
